@@ -27,13 +27,13 @@
                     <label>Bloque 2</label>
                     <input type="time" id="block2Start" value="14:00" class="timeSpot" /> - 
                     <input type="time" id="block2End" value="15:48" class="timeSpot" />
-                    <input type="button" id="removeBlock2" value="Remove" onclick="removeBlock(2)" />
+                    <input type="button" id="removeBlock2" value="Eliminar" onclick="removeBlock(2)" />
                 </div>
             </div>
             <div id="operations">
-                <input type="button" value="Reset" onclick="reset()" />
-                <input type="button" value="Add new block" onclick="addSpot()" />
-                <input type="button" value="Calculate cases" onclick="calculateCases()" />
+                <input type="button" value="Resetear" onclick="reset()" />
+                <input type="button" value="Añadir bloque" onclick="addSpot()" />
+                <input type="button" value="Calcular casos" onclick="calculateCases()" />
             </div>
         </main>
     </body>
@@ -57,7 +57,7 @@
                 <label>Bloque 2</label>
                 <input type="time" id="block2Start" value="14:00" class="timeSpot" /> - 
                 <input type="time" id="block2End" value="15:48" class="timeSpot" />
-                <input type="button" id="removeBlock2" value="Remove" onclick="removeBlock(2)" />
+                <input type="button" id="removeBlock2" value="Eliminar" onclick="removeBlock(2)" />
             </div>`;
             displayedBlocks = 2
         }
@@ -77,7 +77,7 @@
                 <input type="time" id="block${displayedBlocks}Start" value="${lastTime}" class="timeSpot" /> 
                 - 
                 <input type="time" id="block${displayedBlocks}End" value="" class="timeSpot" />
-                <input type="button" id="removeBlock${displayedBlocks}" value="Remove" 
+                <input type="button" id="removeBlock${displayedBlocks}" value="Eliminar" 
                 onclick="removeBlock(${displayedBlocks})" />`;
             blocks.appendChild(newBlock);
         }
@@ -89,7 +89,7 @@
                 const previousBlock = document.getElementById("block"+displayedBlocks);
                 previousBlock.innerHTML += `
                 <input type="button" id="removeBlock${displayedBlocks}" 
-                value="Remove" onclick="removeBlock(${displayedBlocks})" />`;
+                value="Eliminar" onclick="removeBlock(${displayedBlocks})" />`;
             }
         }
 
