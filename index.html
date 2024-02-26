@@ -1,0 +1,192 @@
+<html>
+    <head>
+        <title>Test</title>
+        <style>
+            .main {
+                margin: auto;
+                width: 100%;
+                text-align: center;
+            }
+            .timeSpot {
+                margin: 20px;
+            }
+            button {
+                margin: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div id="blocks">
+                <div id="block1">
+                    <label>Bloque 1</label>
+                    <input type="time" id="block1Start" value="08:00" class="timeSpot" /> - 
+                    <input type="time" id="block1End" value="13:30" class="timeSpot" />
+                </div>
+                <div id="block2">
+                    <label>Bloque 2</label>
+                    <input type="time" id="block2Start" value="14:00" class="timeSpot" /> - 
+                    <input type="time" id="block2End" value="15:48" class="timeSpot" />
+                    <input type="button" id="removeBlock2" value="Remove" onclick="removeBlock(2)" />
+                </div>
+            </div>
+            <div id="operations">
+                <input type="button" value="Reset" onclick="reset()" />
+                <input type="button" value="Add new block" onclick="addSpot()" />
+                <input type="button" value="Calculate cases" onclick="calculateCases()" />
+            </div>
+        </main>
+    </body>
+    <script>
+        const cases = 38;
+        const totalTime = 438; // 7 horas y 18 minutos
+
+        let displayedBlocks = 2;
+
+        let blockError = "";
+
+        function reset() {
+            const blocks = document.getElementById("blocks");
+            blocks.innerHTML = `
+            <div id="block1">
+                <label>Bloque 1</label>
+                <input type="time" id="block1Start" value="08:00" class="timeSpot" /> - 
+                <input type="time" id="block1End" value="13:30" class="timeSpot" />
+            </div>
+            <div id="block2">
+                <label>Bloque 2</label>
+                <input type="time" id="block2Start" value="14:00" class="timeSpot" /> - 
+                <input type="time" id="block2End" value="15:48" class="timeSpot" />
+                <input type="button" id="removeBlock2" value="Remove" onclick="removeBlock(2)" />
+            </div>`;
+            displayedBlocks = 2
+        }
+
+        function addSpot() {
+            const removeBlock = document.getElementById("removeBlock"+displayedBlocks);
+            if (removeBlock) {
+                removeBlock.remove();
+            }
+            const blocks = document.getElementById("blocks");
+            const lastTime = document.getElementById("block"+displayedBlocks+"End").value;
+            displayedBlocks++;
+            const newBlock = document.createElement('div');
+            newBlock.id = "block"+displayedBlocks;
+            newBlock.innerHTML = `
+                <label>Bloque ${displayedBlocks}</label>
+                <input type="time" id="block${displayedBlocks}Start" value="${lastTime}" class="timeSpot" /> 
+                - 
+                <input type="time" id="block${displayedBlocks}End" value="" class="timeSpot" />
+                <input type="button" id="removeBlock${displayedBlocks}" value="Remove" 
+                onclick="removeBlock(${displayedBlocks})" />`;
+            blocks.appendChild(newBlock);
+        }
+
+        function removeBlock(blockId) {
+            document.getElementById("block"+blockId).remove();
+            displayedBlocks--;
+            if (displayedBlocks > 1) {
+                const previousBlock = document.getElementById("block"+displayedBlocks);
+                previousBlock.innerHTML += `
+                <input type="button" id="removeBlock${displayedBlocks}" 
+                value="Remove" onclick="removeBlock(${displayedBlocks})" />`;
+            }
+        }
+
+    function calculateCases() {
+        if (!validateBlocks()) {
+            alert(blockError);
+            blockError ="";
+            return;
+        }
+        if (!validateBlocksConsistency()) {
+            alert(blockError);
+            blockError ="";
+            return;
+        }
+        alert(showCalculatedCases());
+    }
+
+    // Valida que los bloques tengan horas de entrada
+    // menores que las de salida y que no estén vacíos
+    function validateBlocks() {
+        for (let i = 1; i <= displayedBlocks; i++) {
+            const startTime = document.getElementById("block"+i+"Start");
+            const endTime = document.getElementById("block"+i+"End");
+
+            if (!startTime || !endTime) {
+                blockError = "Parece que hay un problema en el bloque "+i;
+                return false; 
+            }
+
+            if (!startTime.value || !endTime.value) {
+                blockError = "Parece que hay un problema recogiendo los tiempos del bloque "+i;
+                return false; 
+            }
+
+            if (startTime.value.length == 0 || endTime.value.length == 0) {
+                blockError = "Parece que la hora de entrada o la de salida no está establecida en el bloque "+i;
+                return false; 
+            }
+
+            if (startTime.value >= endTime.value) {
+                blockError = "Parece que la hora de entrada es igual o superior a la de salida en el bloque "+i;
+                return false; 
+            }
+        }
+
+        return true;
+    }
+
+    // Valida la consistencia entre bloques, de forma que
+    // la hora de entrada de un bloque 2 no sea menor que
+    // la hora de salida del bloque 1
+    function validateBlocksConsistency() {
+        for (let i = 1; i < displayedBlocks; i++) {
+            let j = i + 1;
+            const endTime = document.getElementById("block"+i+"End");
+            const nextStartTime = document.getElementById("block"+j+"Start");
+
+            if (endTime.value > nextStartTime.value) {
+                blockError = "Parece que la hora de salida del bloque "+i+" es superior a la de salida en el bloque "+j;
+                return false; 
+            }
+        }
+        return true;
+    }
+
+    // Calcula los casos que se tendría que haber hecho
+    // en las horas dadas en los bloques y devuelve el
+    // mensaje para que se pinte
+    function showCalculatedCases() {
+        let totalMinutes = 0;
+        let totalMinutesControl = 0;
+        let workedHours = 0;
+        let workedMinutes = 0;
+        for (let i = 1; i <= displayedBlocks; i++) {
+            const startTime = document.getElementById("block"+i+"Start").value;
+            let [startTimeHours, startTimeMinutes] = startTime.split(":");
+            const startTimeTotalMinutes = (parseInt(startTimeHours)*60) + parseInt(startTimeMinutes);
+            const endTime = document.getElementById("block"+i+"End").value;
+            let [endTimeHours, endTimeMinutes] = endTime.split(":");
+            const endTimeTotalMinutes = (parseInt(endTimeHours)*60) + parseInt(endTimeMinutes);
+
+            let difference = endTimeTotalMinutes - startTimeTotalMinutes;
+            totalMinutes += difference;
+        }
+
+        totalMinutesControl = totalMinutes;
+
+        while(totalMinutesControl > 60) {
+            totalMinutesControl -= 60;
+            workedHours++;
+            workedMinutes = totalMinutesControl;
+        }
+
+        let workedCases = Math.ceil( (totalMinutes / totalTime) * cases );
+
+        return "Te piden haber hecho "+workedCases+" casos en las "+workedHours+" horas y "+workedMinutes+" minutos que has trabajado";
+    }
+
+    </script>
+</html>
